@@ -1,0 +1,102 @@
+global:
+  enabled: true
+  tlsDisable: false
+
+server:
+  extraEnvironmentVars:
+    # VAULT_CACERT: /vault/userconfig/tls-ca/ca.crt
+    # # VAULT_CACERT: /vault/userconfig/tls-server/vault.ca
+    # VAULT_TLSCERT: /vault/userconfig/tls-server/server.crt
+    # VAULT_TLSKEY: /vault/userconfig/tls-server/server.key
+    VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
+    VAULT_TLSCERT: /vault/userconfig/vault-server-tls/vault.crt
+    VAULT_TLSKEY: /vault/userconfig/vault-server-tls/vault.key
+
+  # extraVolumes is a list of extra volumes to mount. These will be exposed
+  # to Vault in the path .
+  extraVolumes:
+    # - type: secret
+    #   name: tls-server
+    # - type: secret
+    #   name: tls-ca
+    - type: secret
+      name: vault-server-tls
+    # - type: secret
+    # - name: kms-creds
+
+  ingress:
+    enabled: true
+    labels: {}
+      # traffic: external
+    # annotations: {}
+    annotations:
+      nginx.ingress.kubernetes.io/whitelist-source-range: 10.0.0.0/8,192.168.0.0/24
+      # nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+      nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+
+    ingressClassName: "nginx"
+
+    pathType: Prefix
+
+    activeService: true
+    hosts:
+      - host: vault.uvoo.me
+        paths: []
+    extraPaths: []
+    tls:
+     - secretName: tls-vault-uvoo-me
+       hosts:
+         - vault.uvoo.me
+  ha:
+    enabled: true
+    replicas: 1
+    raft:
+      enabled: true
+      # setNodeId: false
+      setNodeId: true
+
+      config: |
+        ui = true
+        listener "tcp" {
+          tls_disable = 0
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          # tls_cert_file = "/vault/userconfig/tls-server/fullchain.pem"
+          # tls_key_file = "/vault/userconfig/tls-server/server.key"
+          # tls_client_ca_file = "/vault/userconfig/tls-server/client-auth-ca.pem"
+          tls_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+          tls_key_file  = "/vault/userconfig/vault-server-tls/vault.key"
+          tls_client_ca_file = "/vault/userconfig/vault-server-tls/vault.ca"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+            retry_join {
+            leader_api_addr = "https://vault-0.vault-internal:8200"
+            # leader_api_addr = "https://vault-0.vault:8200"
+            # leader_ca_cert_file = "/vault/userconfig/tls-ca/ca.crt"
+            # leader_client_cert_file = "/vault/userconfig/tls-server/server.crt"
+            # leader_client_key_file = "/vault/userconfig/tls-server/server.key"
+            leader_ca_cert_file = "/vault/userconfig/vault-server-tls/vault.ca"
+            leader_client_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+            leader_client_key_file = "/vault/userconfig/vault-server-tls/vault.key"
+          }
+
+          autopilot {
+            # cleanup_dead_servers = "true"
+            cleanup_dead_servers = "false"
+            last_contact_threshold = "200ms"
+            last_contact_failure_threshold = "10m"
+            max_trailing_logs = 250000
+            # min_quorum = 5
+            min_quorum = 1
+            server_stabilization_time = "10s"
+          }
+
+        }
+
+        service_registration "kubernetes" {}
+        # disable_mlock = true
+
+injector:
+  affinity: {}

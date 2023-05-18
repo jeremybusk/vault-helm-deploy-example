@@ -1,0 +1,24 @@
+W1127 12:00:48.681030  428925 gcp.go:119] WARNING: the gcp auth plugin is deprecated in v1.22+, unavailable in v1.26+; use gcloud instead.
+To learn more, consult https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
+Unseal Key 1: AAqeHu3PwCR0lFbjH/TaL9afp5gbEy7upZ7mpxVq6PK7
+Unseal Key 2: cA3IEPMg2ShxiVpLxd0H8FATydZ30FTV+qhNieHtTmzC
+Unseal Key 3: S4GjW/3JNEFgujBxt/tB9dtGwXkbja/at5dge0Ty8N8w
+Unseal Key 4: DohgSLamCAAJOoO8GoWPp0KDNFkNm5hQPHRbkyvT6yvf
+Unseal Key 5: hRQbEQooQ+/vGkAWYWMRlcVgqO0sn1THPi0hwdLdcdDg
+
+Initial Root Token: hvs.lqCoy2j9NiGUYRUrMrzmGo2j
+
+Vault initialized with 5 key shares and a key threshold of 3. Please securely
+distribute the key shares printed above. When the Vault is re-sealed,
+restarted, or stopped, you must supply at least 3 of these keys to unseal it
+before it can start servicing requests.
+
+Vault does not store the generated root key. Without at least 3 keys to
+reconstruct the root key, Vault will remain permanently sealed!
+
+It is possible to generate new unseal keys, provided you have a quorum of
+existing unseal keys shares. See "vault operator rekey" for more information.
+busk@lxd0:~/src/gke-hm/prod/apps/vault$ kubectl exec -ti vault-0 -- vault operator unseal
+W1127 12:01:15.534325  430081 gcp.go:119] WARNING: the gcp auth plugin is deprecated in v1.22+, unavailable in v1.26+; use gcloud instead.
+To learn more, consult https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke
+Unseal Key (will be hidden):

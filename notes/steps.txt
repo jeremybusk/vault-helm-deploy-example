@@ -1,0 +1,7 @@
+./main.sh
+kubectl exec -ti vault-0 -- vault operator init
+# enter 3 of the 5 keys for init output
+kubectl exec -ti vault-0 -- vault operator unseal
+kubectl exec -ti vault-0 -- vault operator unseal
+kubectl exec -ti vault-0 -- vault operator unseal
+kubectl exec -ti vault-0 -- vault login
