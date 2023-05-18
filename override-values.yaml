@@ -40,13 +40,13 @@ server:
 
     activeService: true
     hosts:
-      - host: vault.uvoo.me
+      - host: vault.example.com
         paths: []
     extraPaths: []
     tls:
-     - secretName: tls-vault-uvoo-me
+     - secretName: tls-vault-example-com
        hosts:
-         - vault.uvoo.me
+         - vault.example.com
   ha:
     enabled: true
     replicas: 1
